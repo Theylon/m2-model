@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>m2 model</title>
+<script src="payload_app.js"></script>
+<style>
+  :root{--bg:#FBFAF5;--surface:#FFFFFF;--surface2:#F1EFE8;--text:#2C2C2A;--muted:#5F5E5A;
+    --border:rgba(44,44,42,0.14);--accent:#1D9E75;--neg:#C0532F;}
+  @media (prefers-color-scheme: dark){
+    :root{--bg:#1A1A18;--surface:#242422;--surface2:#2C2C2A;--text:#F1EFE8;--muted:#B4B2A9;
+      --border:rgba(241,239,232,0.16);--accent:#5DCAA5;--neg:#E08763;}}
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem;}
+  .box{background:var(--surface2);border-radius:12px;padding:2rem;width:100%;max-width:360px;}
+  h1{font-size:18px;font-weight:600;margin:0 0 4px;}
+  p{font-size:13px;color:var(--muted);margin:0 0 1.25rem;}
+  label{display:block;font-size:12.5px;color:var(--muted);margin:0 0 4px;}
+  input{width:100%;padding:9px 11px;font-size:14px;margin-bottom:12px;
+    background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:8px;}
+  input:focus{outline:none;border-color:var(--accent);}
+  button{width:100%;padding:10px;font-size:14px;font-weight:600;border:0;border-radius:8px;
+    background:var(--accent);color:var(--bg);cursor:pointer;}
+  button:disabled{opacity:0.6;cursor:wait;}
+  .err{color:var(--neg);font-size:12.5px;min-height:18px;margin-top:10px;}
+</style>
+</head>
+<body>
+<div class="box">
+  <h1>m2 model</h1>
+  <p>Access is limited to invited participants.</p>
+  <form id="f">
+    <label for="e">Email</label>
+    <input id="e" type="email" autocomplete="email" required>
+    <label for="p">Password</label>
+    <input id="p" type="password" autocomplete="current-password" required>
+    <button id="b" type="submit">Open the model</button>
+    <div class="err" id="err"></div>
+  </form>
+</div>
+<script>
+
+const USERS={"88295ed649470f69d1afdea7d8b72c6310cf3ea005c6263ad1bf1ce05328e252": {"s": "9TuANX4mc9HP6Mimdr7abg==", "n": "sGwuEwvIznyCGjVa", "w": "/PKLJY9JMtQXiPEcDjbZ5kLPARu0/EKBYSLUMC90a1jPIckyjtOp6jBcmdeLcmm4"}, "ef3cf80f9f4ae51e1a9d0051780580c68e2bfd8c94adbfd06ab6463e24440620": {"s": "LvUbeMYSlXVxu9+YXDvIog==", "n": "zo/qUvdFIlHE9Z6f", "w": "1W6WAG2UBl78Vc5GfdIgONt3IXC1AqDioHtMEAD0+6aySO3gCjyrWAh5uWBSi8Wu"}, "83b3728f81c1479a690cb48b955b96d9ad916fc6bdf7510817d2c7f089fd9921": {"s": "3JUubJ1a8cFjod1Ype+OSw==", "n": "ZCItkEI0IPkeWGcr", "w": "Gkc1d4D1W7zrJwcb8452NPaa1/G39agblpLYSyKcxOa9FQRiqaQqYKzFRWyp0N+R"}, "cfefb4f5e965a2edb3ae46139f83c2540e5dadcfabd034939e84ae94912c90c8": {"s": "QbvhCTWRhipzHmUV5mrhEg==", "n": "o844NVAMITmG9DJq", "w": "LqwmxiOgEOvT+Ea4tBxq7thXkR8KhS7wgk3X5XCcVh5NYbzr6pXeV6Tm51RjmTfN"}, "6db36419990534804d8fe208b41e31bf556c9af28bc7aad34b2949d540ecb999": {"s": "XjJGsV7T+4WFZwwT4t5vtg==", "n": "iBW3vYq4Avt3B4tp", "w": "cHcf98ZivEmpIg+vOfYFEINi2prj8OqD1z/olgNG2g2tcaLLV6Q2gqTMERQUFl49"}, "d28499ab239223001ef591be046d7baf301a185cb03c9aa91afa3cbcf8379978": {"s": "Eqa/cM9MKzt+NOxzNrbJsA==", "n": "me4dK7z8btJwlugx", "w": "6OtNoxx7KiSxlDvtKpAqAg7wCTZqnIrUvabD9fI3HDjD//hMJiRjTz9SG1PrKxvz"}}, ITERS=300000;
+const b2a=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+async function sha256hex(s){
+  const h=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));
+  return Array.from(new Uint8Array(h)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+async function unwrap(email,pw){
+  const u=USERS[await sha256hex(email.trim().toLowerCase())];
+  if(!u) throw 0;
+  const km=await crypto.subtle.importKey('raw',new TextEncoder().encode(pw),'PBKDF2',false,['deriveKey']);
+  const kd=await crypto.subtle.deriveKey({name:'PBKDF2',salt:b2a(u.s),iterations:ITERS,hash:'SHA-256'},
+      km,{name:'AES-GCM',length:256},false,['decrypt']);
+  const K=await crypto.subtle.decrypt({name:'AES-GCM',iv:b2a(u.n)},kd,b2a(u.w));
+  return new Uint8Array(K);
+}
+async function show(K){
+  const key=await crypto.subtle.importKey('raw',K,'AES-GCM',false,['decrypt']);
+  const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:b2a(window.__PAYLOAD.n)},key,b2a(window.__PAYLOAD.c));
+  const html=new TextDecoder().decode(pt);
+  document.open(); document.write(html); document.close();
+  const t=document.querySelectorAll('title'); if(t.length>1) document.title=t[t.length-1].textContent;
+}
+(async()=>{
+  const k=sessionStorage.getItem('m2k');
+  if(k){ try{ await show(b2a(k)); }catch(e){ sessionStorage.removeItem('m2k'); } }
+})();
+document.getElementById('f').addEventListener('submit',async ev=>{
+  ev.preventDefault();
+  const b=document.getElementById('b'),err=document.getElementById('err');
+  b.disabled=true; err.textContent='';
+  try{
+    const K=await unwrap(document.getElementById('e').value,document.getElementById('p').value);
+    sessionStorage.setItem('m2k',btoa(String.fromCharCode.apply(null,K)));
+    await show(K);
+  }catch(e){
+    err.textContent='That email / password combination does not work.';
+    b.disabled=false;
+  }
+});
+
+</script>
+</body>
+</html>
