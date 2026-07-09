@@ -44,7 +44,7 @@
 </div>
 <script>
 
-const USERS={"88295ed649470f69d1afdea7d8b72c6310cf3ea005c6263ad1bf1ce05328e252": {"s": "R8ldRWHsaXruGKdKNxt65A==", "n": "fy8kT59qC9zlXQKn", "w": "owQXMGMN9KJ6kgRio9xSuwXkDCbEPLFKQAn5EMWSpeCnLqO8+DH6EG8TsaCl+7hz"}, "ef3cf80f9f4ae51e1a9d0051780580c68e2bfd8c94adbfd06ab6463e24440620": {"s": "M5iNFn5Je/KmgSYYgQvXYQ==", "n": "Hbuy6KxRnA0StaXK", "w": "ZSuLL44UI2JaUX6Z9Y8tgnTmPgWguNZw/zdy6eMhkpbkI/0CqcLcMXPhgZvOe1pw"}, "83b3728f81c1479a690cb48b955b96d9ad916fc6bdf7510817d2c7f089fd9921": {"s": "TaqdJlYYRtRkpisIdCDEMA==", "n": "cVvWqNNhDCYLT4M3", "w": "IJJnBxCZ5hkT50lJQvhbnTwOs82WFmj1Zno72K5HExxv6Nx0s2/ItkDmPFARIVHB"}, "cfefb4f5e965a2edb3ae46139f83c2540e5dadcfabd034939e84ae94912c90c8": {"s": "lSLXPKjg0pSRv2TaYF95rA==", "n": "Cau5ofOyy/1lV9Xk", "w": "+6tmNmZNjgLfiDQ8+6ztyayhqUbJZDqaYj3KIhXgE6YGUocgKK24a9KgUDImFXvn"}, "6db36419990534804d8fe208b41e31bf556c9af28bc7aad34b2949d540ecb999": {"s": "1LuuIV4ptM+FIqazkWnDaQ==", "n": "+hSzlboURwgvZK6a", "w": "ThoEPUZ97dyDS2ko2bnJ5bNDYLV5g/zqB2OGYCllVA3toegbNGvbzHPbjFdDtWRe"}, "d28499ab239223001ef591be046d7baf301a185cb03c9aa91afa3cbcf8379978": {"s": "B+sJZ32ZEQ+eclRZmCWauw==", "n": "3lga7/OaAe20DocS", "w": "fYTE52tt8Rg4X4K2/5xSRJdpOXh8mH/hMyWVtVd+qbliM1dfyZt2Ab2kCEg5Vubl"}}, ITERS=300000;
+const USERS={"88295ed649470f69d1afdea7d8b72c6310cf3ea005c6263ad1bf1ce05328e252": {"s": "UFVr2nWOCJT0UUsqnKn/jA==", "n": "0xgS/qi7m8Ds3MVT", "w": "KM62TIg16kcL2YU/3nmjvfQY+oGe93n6iGZAaojkJc4W3vF82rkZ/NnL1H4deF+v"}, "ef3cf80f9f4ae51e1a9d0051780580c68e2bfd8c94adbfd06ab6463e24440620": {"s": "psl0LDIIffK+s0AYiiLP2w==", "n": "iUMi5uRk+KDgkZBA", "w": "Hs9B3FexnjiADBA1i4z/ulScMohjjcHhbdvosHqui8ERw2f+tj02+9jMyTEwJa4k"}, "83b3728f81c1479a690cb48b955b96d9ad916fc6bdf7510817d2c7f089fd9921": {"s": "QZkLVLIYTwecilMstN4i8A==", "n": "uf60dORK6gWPTE1x", "w": "wbkl4oynj7KOBaekCYg6ElCWcPnTaOpokSZD6fXwQ/NEwpRScjNbmw++4zH+4SiB"}, "cfefb4f5e965a2edb3ae46139f83c2540e5dadcfabd034939e84ae94912c90c8": {"s": "BR6qNFyu3Qb5IGhenm4YKQ==", "n": "pLmuQcK964iY6voR", "w": "b28BdZXJtbH7xpXIgaZ4/LAGFwBZNQfhIURMPa9kBcPox602uhbjkGwoBspIkifx"}, "6db36419990534804d8fe208b41e31bf556c9af28bc7aad34b2949d540ecb999": {"s": "b1nZ+oV79umRz8hiBsYNMw==", "n": "7sdQurel0YE9zhhR", "w": "ChTH8310WCxDp7x4q3yr+8ixut9TROko6V0hvLBrml/I6ZbGtGyzKAS1oVGwLlu1"}, "d28499ab239223001ef591be046d7baf301a185cb03c9aa91afa3cbcf8379978": {"s": "6apu7elQDtUZBcdR6vo5lQ==", "n": "lm+tYMTBrG7fDk7A", "w": "6ogX015KsE0CFL8gL6C4PNOyTaoZuLvpyip2P1n6dEdXaoP9olr9bduCpOvVs3/y"}}, ITERS=300000;
 const b2a=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
 async function sha256hex(s){
   const h=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));
@@ -77,6 +77,7 @@ document.getElementById('f').addEventListener('submit',async ev=>{
   try{
     const K=await unwrap(document.getElementById('e').value,document.getElementById('p').value);
     sessionStorage.setItem('m2k',btoa(String.fromCharCode.apply(null,K)));
+    sessionStorage.setItem('m2e',document.getElementById('e').value.trim().toLowerCase());
     await show(K);
   }catch(e){
     err.textContent='That email / password combination does not work.';

@@ -176,6 +176,7 @@ document.getElementById('f').addEventListener('submit',async ev=>{
   try{
     const K=await unwrap(document.getElementById('e').value,document.getElementById('p').value);
     sessionStorage.setItem('m2k',btoa(String.fromCharCode.apply(null,K)));
+    sessionStorage.setItem('m2e',document.getElementById('e').value.trim().toLowerCase());
     await show(K);
   }catch(e){
     err.textContent='That email / password combination does not work.';
